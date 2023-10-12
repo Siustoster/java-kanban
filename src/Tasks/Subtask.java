@@ -2,7 +2,7 @@ package Tasks;
 
 import java.util.Objects;
 
-public class Subtask extends Task{
+public class Subtask extends Task {
     private int epicId;
 
     @Override
@@ -17,10 +17,15 @@ public class Subtask extends Task{
     }
 
     public Subtask(String taskName, String taskDescription, String taskStatus, int epicId) {
-        super(taskName,taskDescription,taskStatus);
+        super(taskName, taskDescription, taskStatus);
         this.epicId = epicId;
     }
 
+    public Subtask(String taskName, String taskDescription, String taskStatus, int epicId, int taskId) {
+        super(taskName, taskDescription, taskStatus);
+        this.epicId = epicId;
+        this.setTaskId(taskId);
+    }
 
 
     @Override

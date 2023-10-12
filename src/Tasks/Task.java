@@ -5,13 +5,20 @@ import java.util.Objects;
 public class Task {
     private String taskName;
     private String taskDescription;
-    private int taskId=0;
+    private int taskId = 0;
     private String taskStatus;
 
-    public Task(String taskName, String taskDescription, String taskStatus){
+    public Task(String taskName, String taskDescription, String taskStatus) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+    }
+
+    public Task(String taskName, String taskDescription, String taskStatus, int taskId) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = taskStatus;
+        this.taskId = taskId;
     }
 
     @Override
@@ -56,5 +63,9 @@ public class Task {
 
     public void setTaskId(int taskId) {
         this.taskId = taskId;
+    }
+
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
     }
 }
