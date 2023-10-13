@@ -3,7 +3,7 @@ import Tasks.*;
 public class Main {
 
     public static void main(String[] args) {
-        /*TaskManager taskManager = new TaskManager();   //Тестирование из конца ТЗ - не знаю нужно ли оно в MAIN. Оставил на всякий случай.
+        TaskManager taskManager = new TaskManager();
         Task task = new Task("Тест таска", "Хотим протестить", "NEW");
         taskManager.createTask(task);
         Epic epic = new Epic("Тест эпика", "тестим эпик");
@@ -26,6 +26,6 @@ public class Main {
         Task task2 = new Task("Обновляем", "Хотим обновить обычный таск", "DONE", 1);
         taskManager.updateTask(task2);
         System.out.println(taskManager.getAllEpicSubTasks(3));
-        System.out.println("Конец теста"); */
+        System.out.println("Конец теста");
     }
 }

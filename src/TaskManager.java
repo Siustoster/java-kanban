@@ -191,6 +191,8 @@ public class TaskManager {
                 currentEpic.setTaskStatus("IN_PROGRESS");
             if (doneTask > 0 && inProgress == 0 && newTask == 0)
                 currentEpic.setTaskStatus("DONE");
+            if (doneTask > 0 && inProgress == 0 && newTask > 0)
+                currentEpic.setTaskStatus("IN_PROGRESS");
         }
     }
 
