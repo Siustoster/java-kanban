@@ -1,5 +1,7 @@
 import Tasks.*;
 
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -22,10 +24,15 @@ public class Main {
         Subtask subtask4 = new Subtask("test", "test", "DONE", 2, 4);
         taskManager.updateSubTask(subtask4);
         taskManager.deleteTaskById(4);
-        System.out.println(taskManager.getTaskById(5));
+        System.out.println(taskManager.getEpicById(2));
         Task task2 = new Task("Обновляем", "Хотим обновить обычный таск", "DONE", 1);
         taskManager.updateTask(task2);
         System.out.println(taskManager.getAllEpicSubTasks(3));
+        System.out.println(taskManager.getAllEpics());
+        Subtask subtask5 = new Subtask("ssss","Описываем тщательно и тестируем хорошо","DONE",3,6);
+        taskManager.updateSubTask(subtask5);
+        System.out.println(taskManager.getAllEpics());
         System.out.println("Конец теста");
+
     }
 }

@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Task {
     private String taskName;
     private String taskDescription;
-    private int taskId = 0;
+    private Integer taskId;
     private String taskStatus;
 
     public Task(String taskName, String taskDescription, String taskStatus) {
@@ -53,7 +53,7 @@ public class Task {
         return taskDescription;
     }
 
-    public int getTaskId() {
+    public Integer getTaskId() {
         return taskId;
     }
 

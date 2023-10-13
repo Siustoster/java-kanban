@@ -1,11 +1,12 @@
 package Tasks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
 public class Epic extends Task {
 
-    private HashMap<Integer, Subtask> subTasksList = new HashMap<>();
+    private ArrayList<Integer> subTasksList = new ArrayList<>();
 
     public Epic(String taskName, String taskDescription) {
         super(taskName, taskDescription, "NEW");
@@ -40,7 +41,7 @@ public class Epic extends Task {
                 '}';
     }
 
-    public HashMap<Integer, Subtask> getSubTasksList() {
+    public ArrayList<Integer> getSubTasksList() {
         return subTasksList;
     }
 
@@ -48,16 +49,27 @@ public class Epic extends Task {
         if (task == null)
             return;
         if (task.getEpicId() == this.getTaskId())
-            subTasksList.put(task.getTaskId(), task);
+            if (!subTasksList.contains(task.getTaskId())) {
+                subTasksList.add(task.getTaskId());
+            }
+
     }
 
     public void clearSubTasks() {
         subTasksList.clear();
     }
 
-    public void removeSubTask(int subTaskId) {
-        if (subTasksList.containsKey(subTaskId)) {
-            subTasksList.remove(subTaskId);
+    public void removeSubTask(Integer subTaskId) {
+        int IndexToDelete = -1;
+        if (!(subTasksList.isEmpty())) {
+            for (Integer taskNum:subTasksList) {
+                if (taskNum.equals(subTaskId)) {
+                    IndexToDelete = subTasksList.indexOf(taskNum);
+                }
+            }
+        }
+        if(IndexToDelete != -1) {
+            subTasksList.remove(IndexToDelete);
         }
     }
 }
