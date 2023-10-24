@@ -1,7 +1,6 @@
 package Tasks;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 public class Epic extends Task {
@@ -9,11 +8,11 @@ public class Epic extends Task {
     private ArrayList<Integer> subTasksList = new ArrayList<>();
 
     public Epic(String taskName, String taskDescription) {
-        super(taskName, taskDescription, "NEW");
+        super(taskName, taskDescription, Statuses.NEW);
     }
 
     public Epic(String taskName, String taskDescription, int taskId) {
-        super(taskName, taskDescription, "NEW");
+        super(taskName, taskDescription, Statuses.NEW);
         this.setTaskId(taskId);
     }
 
@@ -37,7 +36,7 @@ public class Epic extends Task {
                 ", taskDescription='" + getTaskDescription() + '\'' +
                 ", taskId=" + getTaskId() +
                 ", taskStatus='" + getTaskStatus() + '\'' +
-                "subTasksList=" + subTasksList +
+                ", subTasksList=" + subTasksList +
                 '}';
     }
 
@@ -62,13 +61,13 @@ public class Epic extends Task {
     public void removeSubTask(Integer subTaskId) {
         int IndexToDelete = -1;
         if (!(subTasksList.isEmpty())) {
-            for (Integer taskNum:subTasksList) {
+            for (Integer taskNum : subTasksList) {
                 if (taskNum.equals(subTaskId)) {
                     IndexToDelete = subTasksList.indexOf(taskNum);
                 }
             }
         }
-        if(IndexToDelete != -1) {
+        if (IndexToDelete != -1) {
             subTasksList.remove(IndexToDelete);
         }
     }

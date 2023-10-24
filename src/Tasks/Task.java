@@ -6,15 +6,15 @@ public class Task {
     private String taskName;
     private String taskDescription;
     private Integer taskId;
-    private String taskStatus;
+    private Statuses taskStatus;
 
-    public Task(String taskName, String taskDescription, String taskStatus) {
+    public Task(String taskName, String taskDescription, Statuses taskStatus) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
     }
 
-    public Task(String taskName, String taskDescription, String taskStatus, int taskId) {
+    public Task(String taskName, String taskDescription, Statuses taskStatus, int taskId) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
@@ -57,7 +57,7 @@ public class Task {
         return taskId;
     }
 
-    public String getTaskStatus() {
+    public Statuses getTaskStatus() {
         return taskStatus;
     }
 
@@ -65,7 +65,7 @@ public class Task {
         this.taskId = taskId;
     }
 
-    public void setTaskStatus(String taskStatus) {
+    public void setTaskStatus(Statuses taskStatus) {
         this.taskStatus = taskStatus;
     }
 }
