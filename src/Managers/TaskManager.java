@@ -6,29 +6,23 @@ import java.util.*;
 
 public interface TaskManager {
 
-    int generateId();
+    int createTask(Task task);
 
-    void createTask(Task task);
+    int createSubTask(Subtask task);
 
-    void createSubTask(Subtask task);
+    int createEpic(Epic task);
 
-    void createEpic(Epic task);
+    List<Task> getAllTasks();
 
-    HashMap<Integer, Object> getAllTasksAllTypes();
+    List<Epic> getAllEpics();
 
-    ArrayList<Task> getAllTasks();
-
-    ArrayList<Epic> getAllEpics();
-
-    ArrayList<Subtask> getAllSubTasks();
+    List<Subtask> getAllSubTasks();
 
     void deleteAllTasks();
 
     void deleteAllEpics();
 
     void deleteAllSubTasks();
-
-    Object getAnyTaskById(int Id);
 
     Task getTaskById(int Id);
 
@@ -43,8 +37,6 @@ public interface TaskManager {
     void updateSubTask(Subtask task);
 
     ArrayList<Subtask> getAllEpicSubTasks(int epicId);
-
-    void updateEpicStatus(int Id);
 
     void deleteTaskById(int taskId);
 
