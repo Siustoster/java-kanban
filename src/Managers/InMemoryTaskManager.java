@@ -237,17 +237,21 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int taskId) {
         if (taskList.containsKey(taskId)) {
             taskList.remove(taskId);
+            historyManager.remove(taskId);
         } else if (epicList.containsKey(taskId)) {
             ArrayList<Integer> subsList = epicList.get(taskId).getSubTasksList();
             if (!subsList.isEmpty()) {
                 for (Integer entry : subsList) {
                     subTaskList.remove(entry);
+                    historyManager.remove((entry));
                 }
             }
             epicList.remove(taskId);
+            historyManager.remove(taskId);
         } else if (subTaskList.containsKey(taskId)) {
             int epicId = subTaskList.get(taskId).getEpicId();
             subTaskList.remove(taskId);
+            historyManager.remove(taskId);
             epicList.get(epicId).removeSubTask(taskId);
             updateEpicStatus(epicId);
         }
@@ -258,3 +262,4 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 }
+

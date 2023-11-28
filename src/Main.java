@@ -13,14 +13,14 @@ public class Main {
         Epic epic2 = new Epic("Тест эпика 2", "всё еще тестим эпик");
         int epic2Id = taskManager.createEpic(epic2);
         Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
-        Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic2Id);
-        Subtask subtask3 = new Subtask("Тест сабтаска3", "пуц", Statuses.NEW, epic2Id);
+        Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic1Id);
+        Subtask subtask3 = new Subtask("Тест сабтаска3", "пуц", Statuses.NEW, epic1Id);
         int subtask1Id = taskManager.createSubTask(subtask);
         int subtask2Id = taskManager.createSubTask(subtask2);
         int subtask3Id = taskManager.createSubTask(subtask3);
         //Обновление//
-        Task taskToUpdate = taskManager.getTaskById(taskId);
-        taskToUpdate.setTaskStatus(Statuses.IN_PROGRESS);
+        //Task taskToUpdate = taskManager.getTaskById(taskId);
+        //   taskToUpdate.setTaskStatus(Statuses.IN_PROGRESS);
         taskManager.updateTask(task); // аналогично для Subtask и Epic
         taskManager.getTaskById(taskId);
         taskManager.getEpicById(epic1Id);
@@ -34,10 +34,11 @@ public class Main {
         taskManager.getEpicById(epic1Id);
         taskManager.getEpicById(epic1Id);
         taskManager.getEpicById(epic1Id);
+        taskManager.deleteTaskById(epic1Id);
         for (Task t : taskManager.getHistory()) {
             System.out.println(t);// посмотрите историю
         }
-        System.out.println(taskManager.getHistory().size() <= 10); // проверите выполняется ли условие на размер истории
+
 
     }
 }
