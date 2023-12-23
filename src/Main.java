@@ -1,6 +1,9 @@
 import Managers.*;
 import Tasks.*;
 
+import java.io.File;
+import java.nio.file.Path;
+
 
 public class Main {
 
@@ -38,7 +41,10 @@ public class Main {
         for (Task t : taskManager.getHistory()) {
             System.out.println(t);// посмотрите историю
         }
-
-
+        TaskManager files = new FileBackedTasksManager(Path.of("D:/repos/file.txt"));
+        int newTaskss =files.createTask(new Task("Тест таска2222", "Хотим протестить", Statuses.NEW));
+        System.out.println("newTask: "+ newTaskss);
+        newTaskss =files.createTask(new Task("Тест таска2222", "Хотим протестить", Statuses.NEW));
+        System.out.println("newTask: "+ newTaskss);
     }
 }
