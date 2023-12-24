@@ -1,18 +1,21 @@
 import Managers.*;
 import Tasks.*;
 
+import javax.imageio.IIOException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TaskManager taskManager = Managers.getDefault();
         Task task = new Task("Тест таска", "Хотим протестить", Statuses.NEW);
-        int taskId = taskManager.createTask(task);
+        //int taskId = taskManager.createTask(task);
         Epic epic = new Epic("Тест эпика", "тестим эпик");
-        int epic1Id = taskManager.createEpic(epic);
+        /*int epic1Id = taskManager.createEpic(epic);
         Epic epic2 = new Epic("Тест эпика 2", "всё еще тестим эпик");
         int epic2Id = taskManager.createEpic(epic2);
         Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
@@ -37,14 +40,28 @@ public class Main {
         taskManager.getEpicById(epic1Id);
         taskManager.getEpicById(epic1Id);
         taskManager.getEpicById(epic1Id);
-        taskManager.deleteTaskById(epic1Id);
+       // taskManager.deleteTaskById(epic1Id);
         for (Task t : taskManager.getHistory()) {
             System.out.println(t);// посмотрите историю
         }
-        TaskManager files = new FileBackedTasksManager(Path.of("D:/repos/file.txt"));
-        int newTaskss =files.createTask(new Task("Тест таска2222", "Хотим протестить", Statuses.NEW));
-        System.out.println("newTask: "+ newTaskss);
-        newTaskss =files.createTask(new Task("Тест таска2222", "Хотим протестить", Statuses.NEW));
-        System.out.println("newTask: "+ newTaskss);
+        */
+        File file = new File("D:\\Repos\\java-kanban2", "ManagerState.csv");
+        if(!file.exists())
+            Files.createFile(file.toPath());
+
+        FileBackedTasksManager newManager = new FileBackedTasksManager(file);
+        //FileBackedTasksManager newManager = CsvUtils.loadFromFile(file);
+        int epic1Id = newManager.createEpic(epic);
+        Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
+        Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic1Id);
+        Subtask subtask3 = new Subtask("Тест сабтаска3", "пуц", Statuses.NEW, epic1Id);
+        int subtask1Id = newManager.createSubTask(subtask);
+        int subtask2Id = newManager.createSubTask(subtask2);
+        int subtask3Id = newManager.createSubTask(subtask3);
+        int taskId = newManager.createTask(task);
+        newManager.getEpicById(epic1Id);
+        newManager.getSubTaskById(subtask3Id);
+        newManager.getSubTaskById(subtask2Id);
+        newManager.getSubTaskById(subtask1Id);
     }
 }

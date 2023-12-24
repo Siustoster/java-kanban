@@ -1,22 +1,56 @@
 package Managers;
 
-import Tasks.Epic;
-import Tasks.Subtask;
-import Tasks.Task;
+import Tasks.*;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
-    Path filePath;
+    File file;
 
-    public FileBackedTasksManager(Path filePath) {
-        this.filePath = filePath;
-
+    public FileBackedTasksManager(File file) {
+        this.file = file;
     }
 
+    Task fromString(String value) {
+        String[] taskArray = value.split(",");
+        if(TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {
+            return new Task(taskArray[2],taskArray[3], Statuses.valueOf(taskArray[4]),Integer.parseInt(taskArray[0]));
+        } else {
+            if(TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Epic)) {
+                return new Epic(taskArray[2],taskArray[3],Integer.parseInt(taskArray[0]));
+            } else return new Subtask(taskArray[2],taskArray[3],Statuses.valueOf(taskArray[4]),Integer.parseInt(taskArray[5]),Integer.parseInt(taskArray[0]));
+        }
+    }
     private void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 
+            writer.write("id,type,name,description,status,epic");
+            writer.newLine();
+
+            for (Task task : taskList.values()) {
+                writer.write(task.toString());
+                writer.newLine();
+            }
+            for (Epic task : epicList.values()) {
+                writer.write(task.toString());
+                writer.newLine();
+            }
+            for (Subtask task : subTaskList.values()) {
+                writer.write(task.toString());
+                writer.newLine();
+            }
+            writer.newLine();
+            writer.write(CsvUtils.historyToString(historyManager));
+        } catch (IOException e) {
+            throw new ManagerSaveException("Произошла ошибка при сохранении данных в файл");
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

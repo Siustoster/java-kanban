@@ -37,12 +37,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", taskId=" + taskId +
-                ", taskStatus='" + taskStatus + '\'' +
-                '}';
+        return getTaskId() + "," + TaskTypes.Task + "," + getTaskName() + "," + getTaskDescription() + "," + getTaskStatus();
     }
 
     public String getTaskName() {
