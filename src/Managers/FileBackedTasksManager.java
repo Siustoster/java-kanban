@@ -6,8 +6,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
@@ -16,6 +18,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public FileBackedTasksManager(File file) {
         this.file = file;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -24,6 +27,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return taskList.equals(manager.taskList) && subTaskList.equals(manager.subTaskList)
                 && epicList.equals(manager.epicList);
     }
+
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 
@@ -133,5 +137,51 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         Subtask taskToReturn = super.getSubTaskById(Id);
         save();
         return taskToReturn;
+    }
+
+    public static FileBackedTasksManager loadFromFile(File file) {
+        try {
+            FileBackedTasksManager manager = new FileBackedTasksManager(file);
+
+            String fileString = Files.readString(Path.of(file.getPath()));
+            fileString = fileString.replaceAll("\\r", "");
+            String[] lines = fileString.split("\\n");
+
+            if (lines[0].isBlank()) {
+                System.out.println("Ошибка загрузки данных из файла - файл пустой");
+                return manager;
+            }
+
+            for (int i = 0; i < lines.length; i++) {
+                if (lines[i].isBlank()) {
+                    List<Integer> historyIds = CsvUtils.historyFromString(lines[i + 1]);
+                    for (int id : historyIds) {
+                        if (manager.taskList.containsKey(id)) {
+                            // manager.historyManager.add(manager.taskList.get(id));
+                            manager.getTaskById(id);
+                        } else if (manager.epicList.containsKey(id)) {
+                            //manager.historyManager.add(manager.epicList.get(id));
+                            manager.getEpicById(id);
+                        } else {
+                            // manager.historyManager.add(manager.subTaskList.get(id));
+                            manager.getSubTaskById(id);
+                        }
+                    }
+                    return manager;
+                } else {
+                    if (!lines[i].contains("id,type,name,description,status,epic")) {
+                        String[] line = lines[i].split(",");
+                        if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Task)) {
+                            manager.createTask(CsvUtils.fromString(lines[i]));
+                        } else if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Epic)) {
+                            manager.createEpic((Epic) CsvUtils.fromString(lines[i]));
+                        } else manager.createSubTask((Subtask) CsvUtils.fromString(lines[i]));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка загрузки из файла");
+        }
+        return new FileBackedTasksManager(file);
     }
 }

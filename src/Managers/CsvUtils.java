@@ -35,50 +35,6 @@ public class CsvUtils {
         return new ArrayList<>(Arrays.asList(intArray));
     }
 
-    public static FileBackedTasksManager loadFromFile(File file) {
-        try {
-            FileBackedTasksManager manager = new FileBackedTasksManager(file);
-
-            String fileString = Files.readString(Path.of(file.getPath()));
-            String[] lines = fileString.split("\\r\\n");
-
-            if (lines[0].isBlank()) {
-                System.out.println("Ошибка загрузки данных из файла - файл пустой");
-                return manager;
-            }
-
-            for (int i = 0; i < lines.length; i++) {
-                if (lines[i].isBlank()) {
-                    List<Integer> historyIds = CsvUtils.historyFromString(lines[i + 1]);
-                    for (int id : historyIds) {
-                        if (manager.taskList.containsKey(id)) {
-                           // manager.historyManager.add(manager.taskList.get(id));
-                            manager.getTaskById(id);
-                        } else if (manager.epicList.containsKey(id)) {
-                            //manager.historyManager.add(manager.epicList.get(id));
-                            manager.getEpicById(id);
-                        } else {
-                           // manager.historyManager.add(manager.subTaskList.get(id));
-                            manager.getSubTaskById(id);
-                        }
-                    }
-                    return manager;
-                } else {
-                    if (!lines[i].equals("id,type,name,description,status,epic")) {
-                        String[] line = lines[i].split(",");
-                        if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Task)) {
-                            manager.createTask(fromString(lines[i]));
-                        } else if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Epic)) {
-                            manager.createEpic((Epic) fromString(lines[i]));
-                        } else manager.createSubTask((Subtask) fromString(lines[i]));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка загрузки из файла");
-        }
-        return new FileBackedTasksManager(file);
-    }
     public static Task fromString(String value) {
         String[] taskArray = value.split(",");
         if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {

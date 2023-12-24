@@ -51,7 +51,7 @@ public class Main {
             Files.createFile(file.toPath());
         FileBackedTasksManager writeTasksManager = Managers.getDefault(file);
 
-        //FileBackedTasksManager writeTasksManager  = CsvUtils.loadFromFile(file);
+        //FileBackedTasksManager writeTasksManager  = FileBackedTasksManager.loadFromFile(file);
         int epic1Id = writeTasksManager.createEpic(epic);
         Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
         Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic1Id);
@@ -67,7 +67,7 @@ public class Main {
         File file2 = new File("D:\\Repos\\java-kanban2", "ManagerState.csv"); //Здесь вручную меняю
         //наполнение файла пока пауза в дебагере, проверяю сравнение менеджеров
 
-        FileBackedTasksManager readTasksManager = CsvUtils.loadFromFile(file2);
+        FileBackedTasksManager readTasksManager = FileBackedTasksManager.loadFromFile(file2);
         System.out.println("менеджеры совпадают: " + readTasksManager.equals(writeTasksManager));
     }
 }
