@@ -5,3 +5,4 @@ id,type,name,description,status,epic
 3,Subtask,Тест сабтаска2,туц,NEW,1
 4,Subtask,Тест сабтаска3,пуц,NEW,1
 
+1,4,3,2

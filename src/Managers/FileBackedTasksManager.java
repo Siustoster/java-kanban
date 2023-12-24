@@ -8,26 +8,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
-    File file;
+    private final File file;
 
     public FileBackedTasksManager(File file) {
         this.file = file;
     }
-
-    Task fromString(String value) {
-        String[] taskArray = value.split(",");
-        if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {
-            return new Task(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[0]));
-        } else {
-            if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Epic)) {
-                return new Epic(taskArray[2], taskArray[3], Integer.parseInt(taskArray[0]));
-            } else
-                return new Subtask(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[5]), Integer.parseInt(taskArray[0]));
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileBackedTasksManager manager = (FileBackedTasksManager) o;
+        return taskList.equals(manager.taskList) && subTaskList.equals(manager.subTaskList)
+                && epicList.equals(manager.epicList);
     }
-
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 

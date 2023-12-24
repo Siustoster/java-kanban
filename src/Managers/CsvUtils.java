@@ -52,11 +52,14 @@ public class CsvUtils {
                     List<Integer> historyIds = CsvUtils.historyFromString(lines[i + 1]);
                     for (int id : historyIds) {
                         if (manager.taskList.containsKey(id)) {
-                            manager.historyManager.add(manager.taskList.get(id));
+                           // manager.historyManager.add(manager.taskList.get(id));
+                            manager.getTaskById(id);
                         } else if (manager.epicList.containsKey(id)) {
-                            manager.historyManager.add(manager.epicList.get(id));
+                            //manager.historyManager.add(manager.epicList.get(id));
+                            manager.getEpicById(id);
                         } else {
-                            manager.historyManager.add(manager.subTaskList.get(id));
+                           // manager.historyManager.add(manager.subTaskList.get(id));
+                            manager.getSubTaskById(id);
                         }
                     }
                     return manager;
@@ -64,12 +67,10 @@ public class CsvUtils {
                     if (!lines[i].equals("id,type,name,description,status,epic")) {
                         String[] line = lines[i].split(",");
                         if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Task)) {
-                            manager.createTask(new Task(line[2], line[3], Statuses.valueOf(line[4]),
-                                    Integer.parseInt(line[0])));
+                            manager.createTask(fromString(lines[i]));
                         } else if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Epic)) {
-                            manager.createEpic(new Epic(line[2], line[3], Integer.parseInt(line[0])));
-                        } else manager.createSubTask(new Subtask(line[2], line[3], Statuses.valueOf(line[4]),
-                                Integer.parseInt(line[5]), Integer.parseInt(line[0])));
+                            manager.createEpic((Epic) fromString(lines[i]));
+                        } else manager.createSubTask((Subtask) fromString(lines[i]));
                     }
                 }
             }
@@ -77,5 +78,16 @@ public class CsvUtils {
             throw new ManagerSaveException("Ошибка загрузки из файла");
         }
         return new FileBackedTasksManager(file);
+    }
+    public static Task fromString(String value) {
+        String[] taskArray = value.split(",");
+        if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {
+            return new Task(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[0]));
+        } else {
+            if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Epic)) {
+                return new Epic(taskArray[2], taskArray[3], Integer.parseInt(taskArray[0]));
+            } else
+                return new Subtask(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[5]), Integer.parseInt(taskArray[0]));
+        }
     }
 }

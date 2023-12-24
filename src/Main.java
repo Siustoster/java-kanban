@@ -11,7 +11,7 @@ import java.nio.file.Path;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        TaskManager taskManager = Managers.getDefault();
+        //TaskManager taskManager = Managers.getDefault();
         Task task = new Task("Тест таска", "Хотим протестить", Statuses.NEW);
         //int taskId = taskManager.createTask(task);
         Epic epic = new Epic("Тест эпика", "тестим эпик");
@@ -49,21 +49,25 @@ public class Main {
         //ПРИЛОЖИЛ В ГИТЕ ФАЙЛ (ЗАПОЛНЕННЫЙ) С КОТОРЫМ НАЧИНАЛ ТЕСТИРОВАНИЕ
         if (!file.exists())
             Files.createFile(file.toPath());
-        //FileBackedTasksManager newManager = new FileBackedTasksManager(file);
-        FileBackedTasksManager newManager = CsvUtils.loadFromFile(file);
-        int epic1Id = newManager.createEpic(epic);
+        FileBackedTasksManager writeTasksManager = Managers.getDefault(file);
+
+        //FileBackedTasksManager writeTasksManager  = CsvUtils.loadFromFile(file);
+        int epic1Id = writeTasksManager.createEpic(epic);
         Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
         Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic1Id);
         Subtask subtask3 = new Subtask("Тест сабтаска3", "пуц", Statuses.NEW, epic1Id);
-        int subtask1Id = newManager.createSubTask(subtask);
-        int subtask2Id = newManager.createSubTask(subtask2);
-        int subtask3Id = newManager.createSubTask(subtask3);
-        int taskId = newManager.createTask(task);
-        newManager.getEpicById(epic1Id);
-        newManager.getSubTaskById(subtask3Id);
-        newManager.getSubTaskById(subtask2Id);
-        newManager.getSubTaskById(subtask1Id);
-        FileBackedTasksManager newManager2 = CsvUtils.loadFromFile(file);
-        System.out.println("Конец теста");
+        int subtask1Id = writeTasksManager.createSubTask(subtask);
+        int subtask2Id = writeTasksManager.createSubTask(subtask2);
+        int subtask3Id = writeTasksManager.createSubTask(subtask3);
+        int taskId = writeTasksManager.createTask(task);
+        writeTasksManager.getEpicById(epic1Id);
+        writeTasksManager.getSubTaskById(subtask3Id);
+        writeTasksManager.getSubTaskById(subtask2Id);
+        writeTasksManager.getSubTaskById(subtask1Id);
+        File file2 = new File("D:\\Repos\\java-kanban2", "ManagerState.csv"); //Здесь вручную меняю
+        //наполнение файла пока пауза в дебагере, проверяю сравнение менеджеров
+
+        FileBackedTasksManager readTasksManager = CsvUtils.loadFromFile(file2);
+        System.out.println("менеджеры совпадают: " + readTasksManager.equals(writeTasksManager));
     }
 }
