@@ -1,6 +1,7 @@
 package Managers;
 
 import Tasks.*;
+
 import java.util.*;
 
 
@@ -20,12 +21,13 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return 0;
         }
-        if (task.getTaskId() != null) {
-            return 0;
+        if (task.getTaskId() == null) {
+            task.setTaskId(generateId());
         }
-        task.setTaskId(generateId());
-        if (taskList.containsKey(task.getTaskId())) {
-            return 0; //Будет возвращать ошибку, что задача с таким айди уже есть
+
+        while (epicList.containsKey(task.getTaskId()) || subTaskList.containsKey(task.getTaskId()) ||
+                taskList.containsKey(task.getTaskId())) {
+            task.setTaskId(generateId());
         }
         taskList.put(task.getTaskId(), task);
         return task.getTaskId();
@@ -37,12 +39,13 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return 0;
         }
-        if (task.getTaskId() != null) {
-            return 0;
+        if (task.getTaskId() == null) {
+            task.setTaskId(generateId());
         }
-        task.setTaskId(generateId());
-        if (subTaskList.containsKey(task.getTaskId())) {
-            return 0; //будет возвращать ошибку, что подзадача с таким айди уже есть
+
+        while (epicList.containsKey(task.getTaskId()) || subTaskList.containsKey(task.getTaskId()) ||
+                taskList.containsKey(task.getTaskId())) {
+            task.setTaskId(generateId());
         }
         epicId = task.getEpicId();
         if (epicList.containsKey(epicId)) {
@@ -60,13 +63,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return 0;
         }
-        if (task.getTaskId() != null) {
-            return 0;
+        if (task.getTaskId() == null) {
+            task.setTaskId(generateId());
         }
-        task.setTaskId(generateId());
-        if (epicList.containsKey(task.getTaskId())) {
-            return 0; //Будет возвращать ошибку, что эпик с таким айди уже есть
+
+
+        while (epicList.containsKey(task.getTaskId()) || subTaskList.containsKey(task.getTaskId()) ||
+                taskList.containsKey(task.getTaskId())) {
+            task.setTaskId(generateId());
         }
+
         epicList.put(task.getTaskId(), task);
         return task.getTaskId();
     }

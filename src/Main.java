@@ -46,11 +46,11 @@ public class Main {
         }
         */
         File file = new File("D:\\Repos\\java-kanban2", "ManagerState.csv");
-        if(!file.exists())
+        //ПРИЛОЖИЛ В ГИТЕ ФАЙЛ (ЗАПОЛНЕННЫЙ) С КОТОРЫМ НАЧИНАЛ ТЕСТИРОВАНИЕ
+        if (!file.exists())
             Files.createFile(file.toPath());
-
-        FileBackedTasksManager newManager = new FileBackedTasksManager(file);
-        //FileBackedTasksManager newManager = CsvUtils.loadFromFile(file);
+        //FileBackedTasksManager newManager = new FileBackedTasksManager(file);
+        FileBackedTasksManager newManager = CsvUtils.loadFromFile(file);
         int epic1Id = newManager.createEpic(epic);
         Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
         Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic1Id);
@@ -63,5 +63,7 @@ public class Main {
         newManager.getSubTaskById(subtask3Id);
         newManager.getSubTaskById(subtask2Id);
         newManager.getSubTaskById(subtask1Id);
+        FileBackedTasksManager newManager2 = CsvUtils.loadFromFile(file);
+        System.out.println("Конец теста");
     }
 }

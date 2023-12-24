@@ -18,14 +18,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     Task fromString(String value) {
         String[] taskArray = value.split(",");
-        if(TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {
-            return new Task(taskArray[2],taskArray[3], Statuses.valueOf(taskArray[4]),Integer.parseInt(taskArray[0]));
+        if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {
+            return new Task(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[0]));
         } else {
-            if(TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Epic)) {
-                return new Epic(taskArray[2],taskArray[3],Integer.parseInt(taskArray[0]));
-            } else return new Subtask(taskArray[2],taskArray[3],Statuses.valueOf(taskArray[4]),Integer.parseInt(taskArray[5]),Integer.parseInt(taskArray[0]));
+            if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Epic)) {
+                return new Epic(taskArray[2], taskArray[3], Integer.parseInt(taskArray[0]));
+            } else
+                return new Subtask(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[5]), Integer.parseInt(taskArray[0]));
         }
     }
+
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 
