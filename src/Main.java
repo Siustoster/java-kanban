@@ -49,7 +49,7 @@ public class Main {
         //ПРИЛОЖИЛ В ГИТЕ ФАЙЛ (ЗАПОЛНЕННЫЙ) С КОТОРЫМ НАЧИНАЛ ТЕСТИРОВАНИЕ
         if (!file.exists())
             Files.createFile(file.toPath());
-        FileBackedTasksManager writeTasksManager = Managers.getDefault(file);
+        InMemoryTaskManager writeTasksManager = Managers.getDefault();
 
         //FileBackedTasksManager writeTasksManager  = FileBackedTasksManager.loadFromFile(file);
         int epic1Id = writeTasksManager.createEpic(epic);
