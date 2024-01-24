@@ -1,5 +1,6 @@
-package Managers;
+package Tests;
 
+import Managers.TaskManager;
 import Tasks.Epic;
 import Tasks.Statuses;
 import Tasks.Subtask;
@@ -233,5 +234,31 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         Task subtask2 = taskManager.getSubTaskById(subId);
         assertEquals(updatedSubTask,subtask2);
+    }
+    @Test
+    void removeTaskById() {
+        Task task = new Task("Task","Task",Statuses.IN_PROGRESS);
+        int taskId = taskManager.createTask(task);
+        Task taskWithId = new Task("Task","Task",Statuses.IN_PROGRESS,taskId);
+        assertEquals(taskWithId,taskManager.getTaskById(taskId));
+        taskManager.deleteTaskById(taskId);
+        assertNull(taskManager.getTaskById(taskId));
+    }
+    @Test
+    void getHistory() {
+        Epic epic = new Epic("Эпик","эпик");
+        Task task = new Task("Таск","таск",Statuses.IN_PROGRESS);
+        int epicId = taskManager.createEpic(epic);
+        int taskId = taskManager.createTask(task);
+        Subtask subtask = new Subtask("Саб", "саб", Statuses.IN_PROGRESS,epicId);
+        int subtaskId = taskManager.createSubTask(subtask);
+        //Epic createdEpic = new Epic("Эпик", "эпик",epicId);
+        //Subtask subtask2 = new Subtask("Саб","саб",Statuses.IN_PROGRESS,epicId)
+        taskManager.getTaskById(taskId);
+        taskManager.getEpicById(epicId);
+        taskManager.getSubTaskById(subtaskId);
+        List<Task> History = taskManager.getHistory();
+
+        assertEquals(List.of(subtask,epic,task),History);
     }
 }

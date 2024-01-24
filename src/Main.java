@@ -12,9 +12,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         //TaskManager taskManager = Managers.getDefault();
-        Task task = new Task("Тест таска", "Хотим протестить", Statuses.NEW);
+        //Task task = new Task("Тест таска", "Хотим протестить", Statuses.NEW);
         //int taskId = taskManager.createTask(task);
-        Epic epic = new Epic("Тест эпика", "тестим эпик");
+        //Epic epic = new Epic("Тест эпика", "тестим эпик");
         /*int epic1Id = taskManager.createEpic(epic);
         Epic epic2 = new Epic("Тест эпика 2", "всё еще тестим эпик");
         int epic2Id = taskManager.createEpic(epic2);
@@ -45,14 +45,14 @@ public class Main {
             System.out.println(t);// посмотрите историю
         }
         */
-        File file = new File("D:\\Repos\\java-kanban2", "ManagerState.csv");
+        //File file = new File("D:\\Repos\\java-kanban2", "ManagerState.csv");
         //ПРИЛОЖИЛ В ГИТЕ ФАЙЛ (ЗАПОЛНЕННЫЙ) С КОТОРЫМ НАЧИНАЛ ТЕСТИРОВАНИЕ
-        if (!file.exists())
-            Files.createFile(file.toPath());
-        InMemoryTaskManager writeTasksManager = Managers.getDefault();
+        //if (!file.exists())
+         //   Files.createFile(file.toPath());
+        //InMemoryTaskManager writeTasksManager = Managers.getDefault();
 
         //FileBackedTasksManager writeTasksManager  = FileBackedTasksManager.loadFromFile(file);
-        int epic1Id = writeTasksManager.createEpic(epic);
+        /*int epic1Id = writeTasksManager.createEpic(epic);
         Subtask subtask = new Subtask("Тест сабтаска", "тоже хотим потестить", Statuses.NEW, epic1Id);
         Subtask subtask2 = new Subtask("Тест сабтаска2", "туц", Statuses.NEW, epic1Id);
         Subtask subtask3 = new Subtask("Тест сабтаска3", "пуц", Statuses.NEW, epic1Id);
@@ -69,5 +69,12 @@ public class Main {
 
         FileBackedTasksManager readTasksManager = FileBackedTasksManager.loadFromFile(file2);
         System.out.println("менеджеры совпадают: " + readTasksManager.equals(writeTasksManager));
+
+         */
+        InMemoryTaskManager manager = Managers.getDefault();
+        Task task = new Task("Task","Task",Statuses.IN_PROGRESS);
+        int taskId = manager.createTask(task);
+        manager.getTaskById(taskId);
+        manager.deleteTaskById(taskId);
     }
 }
