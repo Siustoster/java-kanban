@@ -173,9 +173,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                         String[] line = lines[i].split(",");
                         if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Task)) {
                             manager.createTask(CsvUtils.fromString(lines[i]));
+                            if(i==(lines.length)-1)
+                                return manager;
                         } else if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Epic)) {
                             manager.createEpic((Epic) CsvUtils.fromString(lines[i]));
-                        } else manager.createSubTask((Subtask) CsvUtils.fromString(lines[i]));
+                            if(i==(lines.length)-1)
+                                return manager;
+                        } else {
+                            manager.createSubTask((Subtask) CsvUtils.fromString(lines[i]));
+                            if(i==(lines.length)-1)
+                                return manager;
+                        }
                     }
                 }
             }

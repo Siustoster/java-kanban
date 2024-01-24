@@ -117,9 +117,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task);
         List<Task> tasksList = taskManager.getAllTasks();
         assertEquals(1, tasksList.size());
-        taskManager.getAllTasks();
+        taskManager.deleteAllTasks();
         tasksList = taskManager.getAllTasks();
-        assertEquals(1, tasksList.size());
+        assertEquals(0, tasksList.size());
     }
 
     @Test

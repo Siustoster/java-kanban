@@ -1,11 +1,13 @@
 package Tasks;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
 
     private ArrayList<Integer> subTasksList = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String taskName, String taskDescription) {
         super(taskName, taskDescription, Statuses.NEW);
@@ -65,5 +67,8 @@ public class Epic extends Task {
         if (IndexToDelete != -1) {
             subTasksList.remove(IndexToDelete);
         }
+    }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 }
