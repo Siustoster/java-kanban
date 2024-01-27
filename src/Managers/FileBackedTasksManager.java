@@ -31,7 +31,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 
-            writer.write("id,type,name,description,status,epic");
+            writer.write("id,type,name,description,status,epic,startTime,duration");
             writer.newLine();
 
             for (Task task : taskList.values()) {
@@ -39,7 +39,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 writer.newLine();
             }
             for (Epic task : epicList.values()) {
-                writer.write(task.toString());
+                writer.write(task.toString2());
                 writer.newLine();
             }
             for (Subtask task : subTaskList.values()) {
@@ -169,7 +169,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     }
                     return manager;
                 } else {
-                    if (!lines[i].contains("id,type,name,description,status,epic")) {
+                    if (!lines[i].contains("id,type,name,description,status,epic,startTime,duration")) {
                         String[] line = lines[i].split(",");
                         if (TaskTypes.valueOf(line[1]).equals(TaskTypes.Task)) {
                             manager.createTask(CsvUtils.fromString(lines[i]));

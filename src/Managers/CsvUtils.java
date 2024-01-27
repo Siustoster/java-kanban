@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,14 +38,19 @@ public class CsvUtils {
     }
 
     public static Task fromString(String value) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         String[] taskArray = value.split(",");
         if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Task)) {
-            return new Task(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[0]));
+            return new Task(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[0])
+                    , taskArray[5] != null ? LocalDateTime.parse(taskArray[5], formatter): null
+                    , taskArray[6] != null ? Integer.parseInt(taskArray[6]): null);
         } else {
             if (TaskTypes.valueOf(taskArray[1]).equals(TaskTypes.Epic)) {
                 return new Epic(taskArray[2], taskArray[3], Integer.parseInt(taskArray[0]));
             } else
-                return new Subtask(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[5]), Integer.parseInt(taskArray[0]));
+                return new Subtask(taskArray[2], taskArray[3], Statuses.valueOf(taskArray[4]), Integer.parseInt(taskArray[5])
+                        , Integer.parseInt(taskArray[0]), taskArray[6] != null ? LocalDateTime.parse(taskArray[6], formatter): null
+                        , taskArray[7] != null ? Integer.parseInt(taskArray[7]): null);
         }
     }
 }

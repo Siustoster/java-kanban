@@ -1,7 +1,10 @@
-package Tasks;
+package Tests;
 
 import Managers.InMemoryTaskManager;
 import Managers.TaskManager;
+import Tasks.Epic;
+import Tasks.Statuses;
+import Tasks.Subtask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

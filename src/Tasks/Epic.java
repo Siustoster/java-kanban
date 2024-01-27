@@ -36,6 +36,11 @@ public class Epic extends Task {
         return getTaskId() + "," + TaskTypes.Epic + "," + getTaskName() + "," + getTaskDescription() + "," + getTaskStatus();
 
     }
+    public String toString2() {
+        return getTaskId() + "," + TaskTypes.Epic + "," + getTaskName() + "," + getTaskDescription() + ","
+                + getTaskStatus() + "," +  (startTime != null ? startTime.format(formatter) : null)  ;
+
+    }
 
     public ArrayList<Integer> getSubTasksList() {
         return subTasksList;
@@ -70,5 +75,9 @@ public class Epic extends Task {
     }
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 }

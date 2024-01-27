@@ -12,6 +12,7 @@ public class Task {
     private Statuses taskStatus;
     protected LocalDateTime startTime;
     protected int duration;
+    protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public Task(String taskName, String taskDescription, Statuses taskStatus) {
         this.taskName = taskName;
@@ -42,6 +43,8 @@ public class Task {
         this.startTime = startTime;
         this.duration = duration;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -76,11 +79,11 @@ public class Task {
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
         return getTaskId() + "," + TaskTypes.Task + "," + getTaskName() + "," + getTaskDescription() + ","
                 + getTaskStatus() + "," + (startTime != null ? startTime.format(formatter) : "не установлена")
-                + "," + (getEndTime() != null ? getEndTime().format(formatter) : "не установлена")
-                + ", " + (duration != 0 ? duration + " минут" : "не установлена");
+                // + "," + (getEndTime() != null ? getEndTime().format(formatter) : "не установлена")
+                + "," + (duration != 0 ? duration  : "не установлена");
 
     }
 

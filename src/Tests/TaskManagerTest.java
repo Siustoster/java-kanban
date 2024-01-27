@@ -1,6 +1,8 @@
 package Tests;
 
+import Managers.InvalidEpicTaskIdException;
 import Managers.TaskManager;
+import Managers.TimeCrossException;
 import Tasks.Epic;
 import Tasks.Statuses;
 import Tasks.Subtask;
@@ -8,10 +10,10 @@ import Tasks.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     public T taskManager;
@@ -59,8 +61,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void createNewSubtaskWithoudEpic() {
 
         Subtask task = new Subtask("Задача", "Описание", Statuses.NEW, 1);
-        int taskId = taskManager.createSubTask(task);
-        assertEquals(0, taskId);
+        assertThrows(InvalidEpicTaskIdException.class,() -> taskManager.createSubTask(task));
     }
 
     @Test
@@ -261,4 +262,164 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(List.of(subtask,epic,task),History);
     }
+    @Test
+    void addNewTask_withTimeCross_inEndTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Task task1 = new Task( "name", "description",Statuses.NEW, startTime, 10);
+        final Task task2 = new Task( "name", "description",Statuses.NEW, startTime.plusMinutes(10), 10);
+
+        taskManager.createTask(task1);
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createTask(task2)
+        );
+
+        assertEquals("Задача пересекается во времени с задачей номер 1", exception.getMessage());
+    }
+
+    @Test
+    void addNewTask_withTimeCross_inBetweenStartEndTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Task task1 = new Task( "name", "description",Statuses.NEW, startTime, 10);
+        final Task task2 = new Task( "name", "description",Statuses.NEW, startTime.plusMinutes(9), 10);
+
+        taskManager.createTask(task1);
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createTask(task2)
+        );
+
+        assertEquals("Задача пересекается во времени с задачей номер 1", exception.getMessage());
+    }
+
+    @Test
+    void addNewTask_withTimeCross_inBetweenStartEndTime_2() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Task task1 = new Task( "name", "description",Statuses.NEW, startTime, 10);
+        final Task task2 = new Task( "name", "description",Statuses.NEW, startTime.minusMinutes(9), 10);
+
+        taskManager.createTask(task1);
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createTask(task2)
+        );
+
+        assertEquals("Задача пересекается во времени с задачей номер 1", exception.getMessage());
+    }
+
+    @Test
+    void addNewSubTask_withTimeCross_inStartTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Epic epicTask = new Epic("epic_1", "description_1");
+        final int epicTaskId = taskManager.createEpic(epicTask); // 1
+
+        final Subtask subTask1 = new Subtask("sub_1", "sub_description_1",Statuses.NEW, epicTaskId, startTime, 10);
+        final Subtask subTask2 = new Subtask("sub_2", "sub_description_2",Statuses.NEW, epicTaskId, startTime.minusMinutes(10), 10);
+        final int subTaskId = taskManager.createSubTask(subTask1); // 2
+
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createSubTask(subTask2)
+        );
+
+        assertEquals(2, subTaskId);
+        assertEquals("Задача пересекается во времени с задачей номер 2", exception.getMessage());
+    }
+
+    @Test
+    void addNewSubTask_withTimeCross_inEndTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Epic epicTask = new Epic("epic_1", "description_1");
+        final int epicTaskId = taskManager.createEpic(epicTask); // 1
+
+        final Subtask subTask1 = new Subtask( "sub_1", "sub_description_1",Statuses.NEW, epicTaskId, startTime, 10);
+        final Subtask subTask2 = new Subtask( "sub_2", "sub_description_2",Statuses.NEW, epicTaskId, startTime.plusMinutes(10), 10);
+        final int subTaskId = taskManager.createSubTask(subTask1); // 2
+
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createSubTask(subTask2)
+        );
+
+        assertEquals(2, subTaskId);
+        assertEquals("Задача пересекается во времени с задачей номер 2", exception.getMessage());
+    }
+
+    @Test
+    void addNewSubTask_withTimeCross_inBetweenStartEndTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Epic epicTask = new Epic("epic_1", "description_1");
+        final int epicTaskId = taskManager.createEpic(epicTask); // 1
+
+        final Subtask subTask1 = new Subtask( "sub_1", "sub_description_1",Statuses.NEW, epicTaskId, startTime, 10);
+        final Subtask subTask2 = new Subtask( "sub_2", "sub_description_2",Statuses.NEW, epicTaskId, startTime.plusMinutes(9), 10);
+        final int subTaskId = taskManager.createSubTask(subTask1); // 2
+
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createSubTask(subTask2)
+        );
+
+        assertEquals(2, subTaskId);
+        assertEquals("Задача пересекается во времени с задачей номер 2", exception.getMessage());
+    }
+
+    @Test
+    void addNewSubTask_withTimeCross_inBetweenStartEndTime_2() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Epic epicTask = new Epic("epic_1", "description_1");
+        final int epicTaskId = taskManager.createEpic(epicTask); // 1
+
+        final Subtask subTask1 = new Subtask( "sub_1", "sub_description_1",Statuses.NEW, epicTaskId, startTime, 10);
+        final Subtask subTask2 = new Subtask( "sub_2", "sub_description_2",Statuses.NEW, epicTaskId, startTime.minusMinutes(9), 10);
+        final int subTaskId = taskManager.createSubTask(subTask1); // 2
+
+        final TimeCrossException exception = assertThrows(
+                TimeCrossException.class,
+                () -> taskManager.createSubTask(subTask2)
+        );
+
+        assertEquals(2, subTaskId);
+        assertEquals("Задача пересекается во времени с задачей номер 2", exception.getMessage());
+    }
+
+    @Test
+    void addNewSubTask_withoutTimeCross_beforeStartTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Epic epicTask = new Epic("epic_1", "description_1");
+        final int epicTaskId = taskManager.createEpic(epicTask); // 1
+
+        final Subtask subTask1 = new Subtask( "sub_1", "sub_description_1",Statuses.NEW, epicTaskId, startTime, 10);
+        final Subtask subTask2 = new Subtask("sub_2", "sub_description_2",Statuses.NEW, epicTaskId, startTime.minusMinutes(11), 10);
+        final int subTaskId1 = taskManager.createSubTask(subTask1); // 2
+        final int subTaskId2 = taskManager.createSubTask(subTask2); // 3
+
+        assertEquals(2, subTaskId1);
+        assertEquals(3, subTaskId2);
+    }
+
+    @Test
+    void addNewSubTask_withoutTimeCross_afterEndTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+
+        final Epic epicTask = new Epic("epic_1", "description_1");
+        final int epicTaskId = taskManager.createEpic(epicTask); // 1
+
+        final Subtask subTask1 = new Subtask( "sub_1", "sub_description_1",Statuses.NEW, epicTaskId, startTime, 10);
+        final Subtask subTask2 = new Subtask( "sub_2", "sub_description_2",Statuses.NEW, epicTaskId, startTime.plusMinutes(11), 10);
+        final int subTaskId1 = taskManager.createSubTask(subTask1); // 2
+        final int subTaskId2 = taskManager.createSubTask(subTask2); // 3
+
+        assertEquals(2, subTaskId1);
+        assertEquals(3, subTaskId2);
+    }
+
 }

@@ -1,5 +1,6 @@
 package Tasks;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -7,7 +8,11 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return getTaskId() + "," + TaskTypes.Subtask + "," + getTaskName() + "," + getTaskDescription() + "," + getTaskStatus()+","+epicId;
+        return getTaskId() + "," + TaskTypes.Subtask + "," + getTaskName() + "," + getTaskDescription() + ","
+                + getTaskStatus() + "," + epicId + ","
+                + (startTime != null ? startTime.format(formatter) : "не установлена")
+                // + "," + (getEndTime() != null ? getEndTime().format(formatter) : "не установлена")
+                + "," + (duration != 0 ? duration : "не установлена");
     }
 
     public Subtask(String taskName, String taskDescription, Statuses taskStatus, int epicId) {
@@ -19,6 +24,18 @@ public class Subtask extends Task {
         super(taskName, taskDescription, taskStatus);
         this.epicId = epicId;
         this.setTaskId(taskId);
+    }
+
+    public Subtask(String taskName, String taskDescription, Statuses taskStatus, int epicId, LocalDateTime startTime, int duration) {
+        super(taskName, taskDescription, taskStatus, startTime, duration);
+        this.epicId = epicId;
+    }
+
+    public Subtask(String taskName, String taskDescription, Statuses taskStatus, int epicId, int taskId
+            , LocalDateTime startTime, int duration) {
+        super(taskName, taskDescription, taskStatus, taskId, startTime, duration);
+        this.epicId = epicId;
+
     }
 
 
