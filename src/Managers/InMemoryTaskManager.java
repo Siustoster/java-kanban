@@ -349,8 +349,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        if (priorityTasksByStartTime.size() == 0) {
-            return  null;
+        if (priorityTasksByStartTime.isEmpty()) {
+            return new ArrayList<Task>();
         }
 
         return List.copyOf(priorityTasksByStartTime);
