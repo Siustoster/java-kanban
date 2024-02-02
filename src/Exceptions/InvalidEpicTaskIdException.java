@@ -1,4 +1,4 @@
-package Managers;
+package Exceptions;
 
 public class InvalidEpicTaskIdException extends RuntimeException {
     public InvalidEpicTaskIdException(String message) {

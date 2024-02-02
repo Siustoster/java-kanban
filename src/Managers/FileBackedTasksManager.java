@@ -1,5 +1,6 @@
 package Managers;
 
+import Exceptions.ManagerSaveException;
 import Tasks.*;
 
 import java.io.BufferedWriter;
@@ -8,9 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private final File file;

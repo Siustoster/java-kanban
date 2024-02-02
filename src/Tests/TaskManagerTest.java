@@ -1,8 +1,8 @@
 package Tests;
 
-import Managers.InvalidEpicTaskIdException;
+import Exceptions.InvalidEpicTaskIdException;
 import Managers.TaskManager;
-import Managers.TimeCrossException;
+import Exceptions.TimeCrossException;
 import Tasks.Epic;
 import Tasks.Statuses;
 import Tasks.Subtask;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
