@@ -157,7 +157,7 @@ public class HttpTaskServerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, response.statusCode());
-        assertEquals("Задача с id = 100 не найдена", response.body());
+        assertEquals("Задача с Id = 100 не найдена", response.body());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class HttpTaskServerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, response.statusCode());
-        assertEquals("Эпик задача с id = 100 не найдена", response.body());
+        assertEquals("Задача с Id = 100 не найдена", response.body());
     }
 
     @Test
@@ -205,7 +205,7 @@ public class HttpTaskServerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(404, response.statusCode());
-        assertEquals("Подзадача с id = 100 не найдена", response.body());
+        assertEquals("Задача с Id = 100 не найдена", response.body());
     }
 
     @Test
@@ -295,19 +295,19 @@ public class HttpTaskServerTest {
         assertEquals(2, actual.size());
         assertEquals("[\n" +
                 "  {\n" +
-                "    \"id\": 1,\n" +
-                "    \"status\": \"NEW\",\n" +
-                "    \"name\": \"task name\",\n" +
-                "    \"description\": \"task description\",\n" +
+                "    \"taskName\": \"task name\",\n" +
+                "    \"taskDescription\": \"task description\",\n" +
+                "    \"taskId\": 1,\n" +
+                "    \"taskStatus\": \"NEW\",\n" +
                 "    \"startTime\": \"01.01.2024 08:00\",\n" +
                 "    \"duration\": 10\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"epicTaskId\": 2,\n" +
-                "    \"id\": 3,\n" +
-                "    \"status\": \"NEW\",\n" +
-                "    \"name\": \"subtask name\",\n" +
-                "    \"description\": \"subtask description\",\n" +
+                "    \"epicId\": 2,\n" +
+                "    \"taskName\": \"subtask name\",\n" +
+                "    \"taskDescription\": \"subtask description\",\n" +
+                "    \"taskId\": 3,\n" +
+                "    \"taskStatus\": \"NEW\",\n" +
                 "    \"startTime\": \"01.01.2024 08:20\",\n" +
                 "    \"duration\": 10\n" +
                 "  }\n" +
@@ -377,7 +377,7 @@ public class HttpTaskServerTest {
         List<Task> tasksAfterDelete = taskManager.getAllTasks();
 
         assertEquals(200, response.statusCode());
-        assertEquals("Задача с Шd = 1 удалена.", response.body());
+        assertEquals("Задача с Id = 1 удалена.", response.body());
         assertEquals(1, tasksBeforeDelete.size());
         assertEquals(0, tasksAfterDelete.size());
     }
@@ -451,7 +451,7 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(404, response.statusCode());
-        assertEquals("Задача с Id = 100 не найдена", response.body());
+        assertEquals("Задача с Id = 100 не найдена.", response.body());
     }
 
     @Test
@@ -1001,7 +1001,7 @@ public class HttpTaskServerTest {
         List<Epic> epicTasksBeforeUpdate = taskManager.getAllEpics();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Epic> epicTasksAfterUpdate = taskManager.getAllEpics();
-        Task actual = gson.fromJson(response.body(), Epic.class);
+        Task actual = epicTasksAfterUpdate.get(0);
 
         assertEquals(200, response.statusCode());
         assertEquals(1, epicTasksBeforeUpdate.size());

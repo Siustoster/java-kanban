@@ -13,6 +13,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import Managers.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +30,7 @@ public class HttpTaskServer {
         Gson gson = Managers.getGson();
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
-        httpServer.createContext("/tasks", new TaskHandler(manager,gson));
+        httpServer.createContext("/tasks", new TaskHandler(manager, gson));
     }
 
     public void startServer() {
@@ -47,7 +48,7 @@ public class HttpTaskServer {
         private final TaskManager manager;
         private final Gson gson;
 
-        public TaskHandler(TaskManager manager,Gson gson) {
+        public TaskHandler(TaskManager manager, Gson gson) {
             this.manager = manager;
             this.gson = gson;
         }
@@ -156,7 +157,10 @@ public class HttpTaskServer {
             Task task;
             try {
                 task = manager.getTaskById(Id);
-                writeResponse(exchange, gson.toJson(task), 200);
+                if (!(task==null))
+                    writeResponse(exchange, gson.toJson(task), 200);
+                else
+                    writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
             } catch (InvalidTaskIdException e) {
                 writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
             }
@@ -166,7 +170,10 @@ public class HttpTaskServer {
             Subtask task;
             try {
                 task = manager.getSubTaskById(Id);
-                writeResponse(exchange, gson.toJson(task), 200);
+                if (!(task==null))
+                    writeResponse(exchange, gson.toJson(task), 200);
+                else
+                    writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
             } catch (InvalidTaskIdException e) {
                 writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
             }
@@ -176,7 +183,10 @@ public class HttpTaskServer {
             Epic task;
             try {
                 task = manager.getEpicById(Id);
-                writeResponse(exchange, gson.toJson(task), 200);
+                if (!(task==null))
+                    writeResponse(exchange, gson.toJson(task), 200);
+                else
+                    writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
             } catch (InvalidTaskIdException e) {
                 writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
             }
@@ -224,7 +234,7 @@ public class HttpTaskServer {
             String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             JsonElement jsonElement = JsonParser.parseString(body);
 
-            if(!jsonElement.isJsonObject()) {
+            if (!jsonElement.isJsonObject()) {
                 writeResponse(exchange, "Ожидался JSON", 400);
                 return;
             }
@@ -295,7 +305,7 @@ public class HttpTaskServer {
             }
 
             try {
-                Subtask newSubTask = new Subtask(st.getTaskName(), st.getTaskDescription(),epicId,  st.getStartTime(),
+                Subtask newSubTask = new Subtask(st.getTaskName(), st.getTaskDescription(), epicId, st.getStartTime(),
                         st.getDuration());
                 manager.createSubTask(newSubTask);
                 writeResponse(exchange, gson.toJson(newSubTask), 200);
@@ -346,10 +356,10 @@ public class HttpTaskServer {
             }
 
             Task t = gson.fromJson(body, Task.class);
-            int id = t.getTaskId();
+
             List<String> errors = new ArrayList<>();
 
-            if (id == 0) {
+            if (t.getTaskId() == null || t.getTaskId() == 0) {
                 errors.add("Отсутствует обязательный параметр id или он равен 0");
             }
 
@@ -373,7 +383,7 @@ public class HttpTaskServer {
                 writeResponse(exchange, String.join("\n", errors), 400);
                 return;
             }
-
+            int id = t.getTaskId();
             Task taskToUpd = manager.getAllTasks().stream().filter(task -> task.getTaskId() == id).findFirst()
                     .orElse(null);
 
@@ -382,7 +392,7 @@ public class HttpTaskServer {
                 return;
             }
 
-            Task task = new Task(t.getTaskName(), t.getTaskDescription(),t.getTaskStatus(),id,  t.getStartTime(), t.getDuration());
+            Task task = new Task(t.getTaskName(), t.getTaskDescription(), t.getTaskStatus(), id, t.getStartTime(), t.getDuration());
 
             try {
                 manager.updateTask(task);
@@ -403,10 +413,10 @@ public class HttpTaskServer {
             }
 
             Subtask st = gson.fromJson(body, Subtask.class);
-            int id = st.getTaskId();
+            //int id = st.getTaskId();
             List<String> errors = new ArrayList<>();
 
-            if (id == 0) {
+            if (st.getTaskId() == null || st.getTaskId() == 0) {
                 errors.add("Отсутствует обязательный параметр id или он равен 0");
             }
 
@@ -426,7 +436,7 @@ public class HttpTaskServer {
                 writeResponse(exchange, String.join("\n", errors), 400);
                 return;
             }
-
+            int id = st.getTaskId();
             Subtask subTaskToUpd = manager.getAllSubTasks().stream().filter(task -> task.getTaskId() == id).findFirst()
                     .orElse(null);
 
@@ -435,8 +445,8 @@ public class HttpTaskServer {
                 return;
             }
 
-            Subtask subTask = new Subtask( st.getTaskName(), st.getTaskDescription(), st.getTaskStatus(),id, subTaskToUpd.getEpicId(), st.getStartTime(),
-                    st.getDuration());
+            Subtask subTask = new Subtask(st.getTaskName(), st.getTaskDescription(), st.getTaskStatus(),
+                    subTaskToUpd.getEpicId(), id, st.getStartTime(), st.getDuration());
 
             try {
                 manager.updateSubTask(subTask);
@@ -457,14 +467,14 @@ public class HttpTaskServer {
             }
 
             Epic et = gson.fromJson(body, Epic.class);
-            int id = et.getTaskId();
+            //int id = et.getTaskId();
 
             List<String> errors = new ArrayList<>();
 
-            if (id == 0) {
+            if (et.getTaskId() == null || et.getTaskId() == 0) {
                 errors.add("Отсутствует обязательный параметр id или он равен 0");
             }
-
+            //int id = et.getTaskId();
             if (et.getTaskName() == null) {
                 errors.add("Отсутствует обязательный параметр name");
             }
@@ -477,14 +487,14 @@ public class HttpTaskServer {
                 writeResponse(exchange, String.join("\n", errors), 400);
                 return;
             }
-
+            int id = et.getTaskId();
             Epic epicToUpd = manager.getAllEpics().stream().filter(e -> e.getTaskId() == id).findFirst().orElse(null);
             if (epicToUpd == null) {
                 writeResponse(exchange, "Эпик задача с id = " + id + " не найдена", 404);
                 return;
             }
 
-            manager.updateEpic(new Epic( et.getTaskName(), et.getTaskDescription(),id));
+            manager.updateEpic(new Epic(et.getTaskName(), et.getTaskDescription(), id));
             writeResponse(exchange, gson.toJson(epicToUpd), 200);
         }
 

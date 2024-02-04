@@ -28,10 +28,16 @@ public class Task {
         this.duration = duration;
     }
     public Task(String taskName, String taskDescription,  LocalDateTime startTime, int duration) {
+        this.taskStatus = Statuses.NEW;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
-        this.startTime = startTime;
+        this.startTime =  roundByMinutes(startTime);
         this.duration = duration;
+    }
+    public Task(String name, String description) {
+        this.taskStatus = Statuses.NEW;
+        this.taskName = name;
+        this.taskDescription = description;
     }
 
     public Task(String taskName, String taskDescription, Statuses taskStatus, int taskId) {
@@ -131,5 +137,10 @@ public class Task {
             return null;
         }
         return startTime.plus(Duration.ofMinutes(duration));
+    }
+    private LocalDateTime roundByMinutes(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+        return LocalDateTime.parse(localDateTime.format(formatter), formatter);
     }
 }
