@@ -38,7 +38,7 @@ public interface TaskManager {
 
     ArrayList<Subtask> getAllEpicSubTasks(int epicId);
 
-    void deleteTaskById(int taskId);
+    int deleteTaskById(int taskId);
 
     List<Task> getHistory();
 

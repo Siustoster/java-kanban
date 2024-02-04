@@ -12,7 +12,7 @@ public class Task {
     private Statuses taskStatus;
     protected LocalDateTime startTime;
     protected int duration;
-    protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    //protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public Task(String taskName, String taskDescription, Statuses taskStatus) {
         this.taskName = taskName;
@@ -24,6 +24,12 @@ public class Task {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+    public Task(String taskName, String taskDescription,  LocalDateTime startTime, int duration) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
         this.startTime = startTime;
         this.duration = duration;
     }
@@ -44,6 +50,12 @@ public class Task {
         this.duration = duration;
     }
 
+    public Task(int id, Statuses statuses, String name, String description) {
+        this.taskId = id;
+        this.taskStatus = statuses;
+        this.taskName = name;
+        this.taskDescription = description;
+    }
 
 
     @Override
@@ -64,6 +76,9 @@ public class Task {
     public LocalDateTime getStartTime() {
         return startTime;
     }
+    public TaskTypes getType() {
+        return TaskTypes.Task;
+    }
 
     public int getDuration() {
         return duration;
@@ -79,7 +94,7 @@ public class Task {
 
     @Override
     public String toString() {
-
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         return getTaskId() + "," + TaskTypes.Task + "," + getTaskName() + "," + getTaskDescription() + ","
                 + getTaskStatus() + "," + (startTime != null ? startTime.format(formatter) : "не установлена")
                 // + "," + (getEndTime() != null ? getEndTime().format(formatter) : "не установлена")

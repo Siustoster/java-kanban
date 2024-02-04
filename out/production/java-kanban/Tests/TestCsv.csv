@@ -1,6 +1,0 @@
-id,type,name,description,status,epic,startTime,duration
-2,Task,Таск,task,NEW,29.01.2024 10:37,5
-1,Epic,Эпик,Эпикas,IN_PROGRESS,29.01.2024 10:47
-3,Subtask,Сабтаск,Сабтаск,IN_PROGRESS,1,29.01.2024 10:47,10
-
-1

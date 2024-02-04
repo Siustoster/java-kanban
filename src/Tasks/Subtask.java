@@ -2,12 +2,13 @@ package Tasks;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-
+import java.time.format.DateTimeFormatter;
 public class Subtask extends Task {
     private int epicId;
 
     @Override
     public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         return getTaskId() + "," + TaskTypes.Subtask + "," + getTaskName() + "," + getTaskDescription() + ","
                 + getTaskStatus() + "," + epicId + ","
                 + (startTime != null ? startTime.format(formatter) : "не установлена")
@@ -28,6 +29,10 @@ public class Subtask extends Task {
 
     public Subtask(String taskName, String taskDescription, Statuses taskStatus, int epicId, LocalDateTime startTime, int duration) {
         super(taskName, taskDescription, taskStatus, startTime, duration);
+        this.epicId = epicId;
+    }
+    public Subtask(String taskName, String taskDescription,  int epicId, LocalDateTime startTime, int duration) {
+        super(taskName, taskDescription, startTime, duration);
         this.epicId = epicId;
     }
 
@@ -57,4 +62,8 @@ public class Subtask extends Task {
         return epicId;
     }
 
+    @Override
+    public TaskTypes getType() {
+        return TaskTypes.Subtask;
+    }
 }

@@ -1,28 +1,35 @@
 package Managers.Server;
 
+import Exceptions.InvalidTaskIdException;
+import Exceptions.TimeCrossException;
 import Managers.TaskManager;
+import Tasks.Epic;
+import Tasks.Subtask;
+import Tasks.Task;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
+import Managers.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
     private final HttpServer httpServer;
 
     public HttpTaskServer(TaskManager manager) throws IOException {
+        Gson gson = Managers.getGson();
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
-        httpServer.createContext("/tasks", new TaskHandler(manager));
+        httpServer.createContext("/tasks", new TaskHandler(manager,gson));
     }
 
     public void startServer() {
@@ -40,9 +47,9 @@ public class HttpTaskServer {
         private final TaskManager manager;
         private final Gson gson;
 
-        public TaskHandler(TaskManager manager) {
+        public TaskHandler(TaskManager manager,Gson gson) {
             this.manager = manager;
-            this.gson = new Gson();
+            this.gson = gson;
         }
 
         @Override
@@ -56,18 +63,18 @@ public class HttpTaskServer {
             if (endpoint.equals(Endpoints.GET_TASK_BY_ID) || endpoint.equals(Endpoints.GET_SUBTASK_BY_ID)
                     || endpoint.equals(Endpoints.GET_EPICTASK_BY_ID) || endpoint.equals(Endpoints.DELETE_TASK_BY_ID)
                     || endpoint.equals(Endpoints.DELETE_SUBTASK_BY_ID)
-                    || endpoint.equals(Endpoints.DELETE_EPICTASK_BY_ID)){
+                    || endpoint.equals(Endpoints.DELETE_EPICTASK_BY_ID)) {
                 if (params == null || params.get("id") == null) {
                     writeResponse(exchange, "Необходимо передать Id задачи", 400);
                     return;
                 }
+                try {
+                    id = Integer.parseInt(params.get("id"));
+                } catch (NumberFormatException | NullPointerException e) {
+                    writeResponse(exchange, "Неверный формат Id задачи", 400);
+                }
             }
-            try {
-                id = Integer.parseInt(params.get("id"));
-            }
-            catch (NumberFormatException | NullPointerException e) {
-                writeResponse(exchange,"Неверный формат Id задачи", 400);
-            }
+
             switch (endpoint) {
                 case GET_TASKS:
                     handleGetTasks(exchange);
@@ -120,22 +127,367 @@ public class HttpTaskServer {
                 case DELETE_EPICTASKS:
                     handleDeleteEpicTasks(exchange);
                 case DELETE_TASK_BY_ID:
-                    handleDeleteTaskById(exchange, id);
-                    break;
                 case DELETE_SUBTASK_BY_ID:
-                    handleDeleteSubTaskById(exchange, id);
-                    break;
                 case DELETE_EPICTASK_BY_ID:
-                    handleDeleteEpicTaskById(exchange, id);
+                    handleDeleteTaskById(exchange, id);
                     break;
                 case UNKNOWN:
                     writeResponse(exchange, "Такого эндпоинта не существует", 404);
             }
 
         }
-        private void handleGetTasks(HttpExchange exchange) {
 
+        private void handleGetTasks(HttpExchange exchange) throws IOException {
+            List<Task> taskList = manager.getAllTasks();
+            writeResponse(exchange, gson.toJson(taskList), 200);
         }
+
+        private void handleGetSubTasks(HttpExchange exchange) throws IOException {
+            List<Subtask> taskList = manager.getAllSubTasks();
+            writeResponse(exchange, gson.toJson(taskList), 200);
+        }
+
+        private void handleGetEpicTasks(HttpExchange exchange) throws IOException {
+            List<Epic> taskList = manager.getAllEpics();
+            writeResponse(exchange, gson.toJson(taskList), 200);
+        }
+
+        private void handleGetTaskById(HttpExchange exchange, int Id) throws IOException {
+            Task task;
+            try {
+                task = manager.getTaskById(Id);
+                writeResponse(exchange, gson.toJson(task), 200);
+            } catch (InvalidTaskIdException e) {
+                writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
+            }
+        }
+
+        private void handleGetSubTaskById(HttpExchange exchange, int Id) throws IOException {
+            Subtask task;
+            try {
+                task = manager.getSubTaskById(Id);
+                writeResponse(exchange, gson.toJson(task), 200);
+            } catch (InvalidTaskIdException e) {
+                writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
+            }
+        }
+
+        private void handleGetEpicTaskById(HttpExchange exchange, int Id) throws IOException {
+            Epic task;
+            try {
+                task = manager.getEpicById(Id);
+                writeResponse(exchange, gson.toJson(task), 200);
+            } catch (InvalidTaskIdException e) {
+                writeResponse(exchange, "Задача с Id = " + Id + " не найдена", 404);
+            }
+        }
+
+        private void handleGetHistory(HttpExchange exchange) throws IOException {
+            List<Task> history = manager.getHistory();
+            if (history == null) {
+                history = new ArrayList<>();
+            }
+            writeResponse(exchange, gson.toJson(history), 200);
+        }
+
+        private void handleGetPrioritized(HttpExchange exchange) throws IOException {
+            List<Task> prioretised = manager.getPrioritizedTasks();
+            writeResponse(exchange, gson.toJson(prioretised), 200);
+        }
+
+        private void handleDeleteTasks(HttpExchange exchange) throws IOException {
+            manager.deleteAllTasks();
+            writeResponse(exchange, "Все таски удалены", 200);
+        }
+
+        private void handleDeleteSubTasks(HttpExchange exchange) throws IOException {
+            manager.deleteAllSubTasks();
+            writeResponse(exchange, "Все сабтаски удалены", 200);
+        }
+
+        private void handleDeleteEpicTasks(HttpExchange exchange) throws IOException {
+            manager.deleteAllEpics();
+            writeResponse(exchange, "Все эпики удалены", 200);
+        }
+
+        private void handleDeleteTaskById(HttpExchange exchange, int Id) throws IOException {
+            int deleteResult = manager.deleteTaskById(Id);
+            if (deleteResult == 1) {
+                writeResponse(exchange, "Задача с Id = " + Id + " удалена.", 200);
+            } else {
+                writeResponse(exchange, "Задача с Id = " + Id + " не найдена.", 404);
+            }
+        }
+
+        private void handlePostTask(HttpExchange exchange) throws IOException {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            JsonElement jsonElement = JsonParser.parseString(body);
+
+            if(!jsonElement.isJsonObject()) {
+                writeResponse(exchange, "Ожидался JSON", 400);
+                return;
+            }
+
+            Task t = gson.fromJson(body, Task.class);
+            List<String> errors = new ArrayList<>();
+
+            if (t.getTaskName() == null) {
+                errors.add("Отсутствует обязательный параметр name");
+            }
+
+            if (t.getTaskDescription() == null) {
+                errors.add("Отсутствует обязательный параметр description");
+            }
+
+            if (t.getStartTime() == null && t.getDuration() != 0) {
+                errors.add("Была указанна продолжительности (duration), но отсутствует параметр startTime");
+            }
+
+            if (errors.size() > 0) {
+                writeResponse(exchange, String.join("\n", errors), 400);
+                return;
+            }
+
+            try {
+                Task task = new Task(t.getTaskName(), t.getTaskDescription(), t.getStartTime(), t.getDuration());
+                manager.createTask(task);
+                writeResponse(exchange, gson.toJson(task), 200);
+            } catch (TimeCrossException e) {
+                writeResponse(exchange, e.getMessage(), 400);
+            }
+        }
+
+        private void handlePostSubTask(HttpExchange exchange) throws IOException {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            JsonElement jsonElement = JsonParser.parseString(body);
+
+            if (!jsonElement.isJsonObject()) {
+                writeResponse(exchange, "Неверный формат JSON", 400);
+                return;
+            }
+
+            Subtask st = gson.fromJson(body, Subtask.class);
+            int epicId = st.getEpicId();
+
+            List<String> errors = new ArrayList<>();
+
+            if (epicId == 0) {
+                errors.add("Отсутствует обязательный параметр epicTaskId или он равен 0");
+            }
+
+            if (st.getTaskName() == null) {
+                errors.add("Отсутствует обязательный параметр name");
+            }
+
+            if (st.getTaskDescription() == null) {
+                errors.add("Отсутствует обязательный параметр description");
+            }
+
+            if (st.getStartTime() == null && st.getDuration() != 0) {
+                errors.add("Была указанна продолжительности (duration), но отсутствует параметр startTime");
+            }
+
+            if (errors.size() > 0) {
+                writeResponse(exchange, String.join("\n", errors), 400);
+                return;
+            }
+
+            try {
+                Subtask newSubTask = new Subtask(st.getTaskName(), st.getTaskDescription(),epicId,  st.getStartTime(),
+                        st.getDuration());
+                manager.createSubTask(newSubTask);
+                writeResponse(exchange, gson.toJson(newSubTask), 200);
+            } catch (TimeCrossException | InvalidTaskIdException e) {
+                writeResponse(exchange, e.getMessage(), 400);
+            }
+        }
+
+        private void handlePostEpicTask(HttpExchange exchange) throws IOException {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            JsonElement jsonElement = JsonParser.parseString(body);
+
+            if (!jsonElement.isJsonObject()) {
+                writeResponse(exchange, "Ожидался JSON", 400);
+                return;
+            }
+
+            Epic et = gson.fromJson(body, Epic.class);
+            List<String> errors = new ArrayList<>();
+
+            if (et.getTaskName() == null) {
+                errors.add("Отсутствует обязательный параметр name");
+            }
+
+            if (et.getTaskDescription() == null) {
+                errors.add("Отсутствует обязательный параметр description");
+            }
+
+            if (errors.size() > 0) {
+                writeResponse(exchange, String.join("\n", errors), 400);
+                return;
+            }
+
+            Epic newEpicTask = new Epic(et.getTaskName(), et.getTaskDescription());
+            manager.createEpic(newEpicTask);
+            writeResponse(exchange, gson.toJson(newEpicTask), 200);
+        }
+
+        private void handlePutTask(HttpExchange exchange) throws IOException {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            JsonElement jsonElement = JsonParser.parseString(body);
+
+            if (!jsonElement.isJsonObject()) {
+                writeResponse(exchange, "Ожидался JSON", 400);
+                return;
+            }
+
+            Task t = gson.fromJson(body, Task.class);
+            int id = t.getTaskId();
+            List<String> errors = new ArrayList<>();
+
+            if (id == 0) {
+                errors.add("Отсутствует обязательный параметр id или он равен 0");
+            }
+
+            if (t.getTaskStatus() == null) {
+                errors.add("Отсутствует обязательный параметр status");
+            }
+
+            if (t.getTaskName() == null) {
+                errors.add("Отсутствует обязательный параметр name");
+            }
+
+            if (t.getTaskDescription() == null) {
+                errors.add("Отсутствует обязательный параметр description");
+            }
+
+            if (t.getStartTime() == null && t.getDuration() != 0) {
+                errors.add("Была указанна продолжительности (duration), но отсутствует параметр startTime");
+            }
+
+            if (errors.size() > 0) {
+                writeResponse(exchange, String.join("\n", errors), 400);
+                return;
+            }
+
+            Task taskToUpd = manager.getAllTasks().stream().filter(task -> task.getTaskId() == id).findFirst()
+                    .orElse(null);
+
+            if (taskToUpd == null) {
+                writeResponse(exchange, "Задача с id = " + id + " не найдена", 404);
+                return;
+            }
+
+            Task task = new Task(t.getTaskName(), t.getTaskDescription(),t.getTaskStatus(),id,  t.getStartTime(), t.getDuration());
+
+            try {
+                manager.updateTask(task);
+                writeResponse(exchange, gson.toJson(task), 200);
+            } catch (TimeCrossException e) {
+                writeResponse(exchange, e.getMessage(), 400);
+            }
+        }
+
+        private void handlePutSubTask(HttpExchange exchange) throws IOException {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            JsonElement jsonElement = JsonParser.parseString(body);
+
+            if (!jsonElement.isJsonObject()) {
+                writeResponse(exchange, "Ожидался JSON", 400);
+                return;
+            }
+
+            Subtask st = gson.fromJson(body, Subtask.class);
+            int id = st.getTaskId();
+            List<String> errors = new ArrayList<>();
+
+            if (id == 0) {
+                errors.add("Отсутствует обязательный параметр id или он равен 0");
+            }
+
+            if (st.getTaskName() == null) {
+                errors.add("Отсутствует обязательный параметр name");
+            }
+
+            if (st.getTaskDescription() == null) {
+                errors.add("Отсутствует обязательный параметр description");
+            }
+
+            if (st.getStartTime() == null && st.getDuration() != 0) {
+                errors.add("Была указанна продолжительности (duration), но отсутствует параметр startTime");
+            }
+
+            if (errors.size() > 0) {
+                writeResponse(exchange, String.join("\n", errors), 400);
+                return;
+            }
+
+            Subtask subTaskToUpd = manager.getAllSubTasks().stream().filter(task -> task.getTaskId() == id).findFirst()
+                    .orElse(null);
+
+            if (subTaskToUpd == null) {
+                writeResponse(exchange, "Подзадача с id = " + id + " не найдена", 404);
+                return;
+            }
+
+            Subtask subTask = new Subtask( st.getTaskName(), st.getTaskDescription(), st.getTaskStatus(),id, subTaskToUpd.getEpicId(), st.getStartTime(),
+                    st.getDuration());
+
+            try {
+                manager.updateSubTask(subTask);
+                writeResponse(exchange, gson.toJson(subTask), 200);
+            } catch (TimeCrossException | InvalidTaskIdException e) {
+                writeResponse(exchange, e.getMessage(), 400);
+            }
+        }
+
+        private void handlePutEpicTask(HttpExchange exchange) throws IOException {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            JsonElement jsonElement = JsonParser.parseString(body);
+
+            if (!jsonElement.isJsonObject()) {
+                writeResponse(exchange, "Ожидался JSON", 400);
+                return;
+            }
+
+            Epic et = gson.fromJson(body, Epic.class);
+            int id = et.getTaskId();
+
+            List<String> errors = new ArrayList<>();
+
+            if (id == 0) {
+                errors.add("Отсутствует обязательный параметр id или он равен 0");
+            }
+
+            if (et.getTaskName() == null) {
+                errors.add("Отсутствует обязательный параметр name");
+            }
+
+            if (et.getTaskDescription() == null) {
+                errors.add("Отсутствует обязательный параметр description");
+            }
+
+            if (errors.size() > 0) {
+                writeResponse(exchange, String.join("\n", errors), 400);
+                return;
+            }
+
+            Epic epicToUpd = manager.getAllEpics().stream().filter(e -> e.getTaskId() == id).findFirst().orElse(null);
+            if (epicToUpd == null) {
+                writeResponse(exchange, "Эпик задача с id = " + id + " не найдена", 404);
+                return;
+            }
+
+            manager.updateEpic(new Epic( et.getTaskName(), et.getTaskDescription(),id));
+            writeResponse(exchange, gson.toJson(epicToUpd), 200);
+        }
+
         private void writeResponse(HttpExchange exchange,
                                    String responseString,
                                    int responseCode) throws IOException {
@@ -150,6 +502,7 @@ public class HttpTaskServer {
             }
             exchange.close();
         }
+
         private Endpoints getEndpoint(String method, String path, boolean haveParams) {
             String[] pathParts = path.split("/");
 

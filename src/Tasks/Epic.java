@@ -3,7 +3,7 @@ package Tasks;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
-
+import java.time.format.DateTimeFormatter;
 public class Epic extends Task {
 
     private ArrayList<Integer> subTasksList = new ArrayList<>();
@@ -37,11 +37,15 @@ public class Epic extends Task {
 
     }
     public String toString2() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         return getTaskId() + "," + TaskTypes.Epic + "," + getTaskName() + "," + getTaskDescription() + ","
                 + getTaskStatus() + "," +  (startTime != null ? startTime.format(formatter) : null)  ;
 
     }
-
+    @Override
+    public TaskTypes getType() {
+        return TaskTypes.Epic;
+    }
     public ArrayList<Integer> getSubTasksList() {
         return subTasksList;
     }
