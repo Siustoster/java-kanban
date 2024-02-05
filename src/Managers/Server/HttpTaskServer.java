@@ -413,7 +413,7 @@ public class HttpTaskServer {
             }
 
             Subtask st = gson.fromJson(body, Subtask.class);
-            //int id = st.getTaskId();
+
             List<String> errors = new ArrayList<>();
 
             if (st.getTaskId() == null || st.getTaskId() == 0) {
@@ -467,14 +467,14 @@ public class HttpTaskServer {
             }
 
             Epic et = gson.fromJson(body, Epic.class);
-            //int id = et.getTaskId();
+
 
             List<String> errors = new ArrayList<>();
 
             if (et.getTaskId() == null || et.getTaskId() == 0) {
                 errors.add("Отсутствует обязательный параметр id или он равен 0");
             }
-            //int id = et.getTaskId();
+
             if (et.getTaskName() == null) {
                 errors.add("Отсутствует обязательный параметр name");
             }
